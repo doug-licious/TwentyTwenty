@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ computer.hostname }}</h1>
+<h2>{{ computer.cpu }}, {{ computer.address }} </h2>
+<h2>Desk {{ computer.desk }}</h2>
+<table class="table table-striped">
+    {% for s in computer.software_set.all %}
+    <tr>
+        <td>{{ s.title }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

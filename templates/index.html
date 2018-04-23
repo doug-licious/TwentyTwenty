@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+{% block content %}
+<table class="table table-striped">
+    {% for d in desks %}
+    <tr>
+        <td><A href="/desk/{{d.desk_number}}"> Desk: {{ d.desk_number }}</a></td>
+        {% for u in d.druser_set.all %}
+        <td>{{ u.username }}</td>
+        {% endfor %}
+        {% for c in d.computer_set.all %}
+        <td><a href="computer/{{c.hostname}}">{{ c.hostname }}</a></td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

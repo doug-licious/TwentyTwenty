@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for s in software %}
+<p>  {{ s.num_title }}  {{ s.title }} {{s.version}} </p>
+{% endfor %}
+{% endblock %}

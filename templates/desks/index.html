@@ -1,0 +1,9 @@
+{% if my_desks %}
+    <ul>
+    {% for d in my_desks %}
+        <li><a href="/desks/{{ u.id }}/">{{ d.desk_number }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Desks Loaded</p>
+{% endif %}

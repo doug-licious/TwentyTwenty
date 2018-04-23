@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block content %}
+<table>
+    <thead><tr><th>Hostname</th><th>CPU</th><th>SUBNET</th><th>DESK</th></tr></thead>
+    {% for c in computers %}
+
+    <tr><td><a href="computer/{{c.hostname}}">{{c.hostname}}</a></td><td>{{ c.cpu }}</td><td> {{ c.address }} </td><td><A href="desk/{{c.desk}}">{{ c.desk }}</a></td></tr>
+    {% endfor %}
+</table>
+{% endblock %}
