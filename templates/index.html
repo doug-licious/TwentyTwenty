@@ -5,11 +5,11 @@
     {% for d in desks %}
     <tr>
         <td><A href="/desk/{{d.desk_number}}"> Desk: {{ d.desk_number }}</a></td>
-        {% for u in d.druser_set.all %}
-        <td>{{ u.username }}</td>
-        {% endfor %}
+
+        <td> {% for u in d.druser_set.all %} <p>{{ u.lastname }}, {{u.firstname}}, {{ u.username }} </p>{% endfor %} </td>
+
         {% for c in d.computer_set.all %}
-        <td><a href="computer/{{c.hostname}}">{{ c.hostname }}</a></td>
+        <td><a href="computer/{{c.hostname}}">{{ c.hostname }}</a><small>{{c.cpu }}</small> </td>
         {% endfor %}
     </tr>
     {% endfor %}

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 {% for s in software %}
-<p>  {{ s.num_title }}  {{ s.title }} {{s.version}} </p>
+<div class="row">{{ s.num_title }}  {{ s.title }} {{s.version}} </div>
 {% endfor %}
 {% endblock %}

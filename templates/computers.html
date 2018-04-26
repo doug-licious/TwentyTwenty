@@ -3,11 +3,59 @@
 
 
 {% block content %}
-<table>
-    <thead><tr><th>Hostname</th><th>CPU</th><th>SUBNET</th><th>DESK</th></tr></thead>
-    {% for c in computers %}
+<h2>Reports</h2>
+<div class="row">
+    <div class="col-md-6">
+        <h3>All Computers</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Hostname</th>
+                <th>CPU</th>
+                <th>SUBNET</th>
+                <th>DESK</th>
+            </tr>
+            </thead>
+            {% for c in computers %}
 
-    <tr><td><a href="computer/{{c.hostname}}">{{c.hostname}}</a></td><td>{{ c.cpu }}</td><td> {{ c.address }} </td><td><A href="desk/{{c.desk}}">{{ c.desk }}</a></td></tr>
-    {% endfor %}
-</table>
+            <tr>
+                <td><a href="computer/{{c.hostname}}">{{c.hostname}}</a></td>
+                <td>{{ c.cpu }}</td>
+                <td> {{ c.address }}</td>
+                <td><A href="desk/{{c.desk}}">{{ c.desk }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>CPUs</h3>
+        <table class="table">
+            {% for c in cpu %}
+            <tr>
+                <td>{{c.cpu}}</td>
+                <td>{{c.cpu__count}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>Subnets</h3>
+      <table class="table">
+            {% for c in subnet %}
+            <tr>
+                <td>{{c.address}}</td>
+                <td>{{c.address__count}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>RAM</h3>
+      <table class="table">
+            {% for c in ram %}
+            <tr>
+                <td>{{c.ram}}</td>
+                <td>{{c.ram__count}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    </div>
+</div>
 {% endblock %}

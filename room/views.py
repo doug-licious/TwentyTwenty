@@ -2,14 +2,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .resources import DeskResource, DRUserResource
 from .models import Room, DRUser, Computer, Desk, Software
-from django import forms
-from django.forms.models import model_to_dict
 from django.db.models import Count
 
-from graphos.sources.model import ModelDataSource
 from graphos.sources.simple import SimpleDataSource
 from graphos.renderers.gchart import BarChart
+from graphos.renderers.gchart import ColumnChart
 
+
+# from graphos.renderers.yui import BarChart
 
 # Create your views here.
 
@@ -25,12 +25,12 @@ def index(request):
     # return HttpResponse(r[0].desk_number)
 
 
-def software(request):
+def software(request, title):
     # s = Software.objects.values('title') \
-    s = Software.objects.all()
+    s = Software.objects.filter(title__icontains=title)
     # .annotate(num_title=Count('id'))
 
-    return render(request, 'software.html', {'software': s})
+    return render(request, 'software_machine.html', {'software': s})
 
 
 def software2(request):
@@ -47,9 +47,15 @@ def computer(request, hostname):
     c = Computer.objects.get(hostname=hostname)
     return render(request, 'computer.html', {'computer': c})
 
+
 def computers(request):
     c = Computer.objects.all()
-    return render(request, 'computers.html', {'computers': c})
+    cpu = Computer.objects.values('cpu').annotate(Count('cpu')).order_by('-cpu__count')
+    subnet = Computer.objects.values('address').annotate(Count('address')).order_by('-address__count')
+    ram = Computer.objects.values('ram').annotate(Count('ram')).order_by('-ram')
+
+    return render(request, 'computers.html', {'computers': c, 'cpu': cpu, 'subnet': subnet, 'ram': ram})
+
 
 # Graphos doesn't like the Queryset result from .values, so turn it into a list it will swallow.
 def mung_table(table):
@@ -61,30 +67,43 @@ def mung_table(table):
     return data
 
 
+# Graphos doesn't like the Queryset result from .values, so turn it into a list it will swallow.
+# expect headers to match column names
+def listify_table_with_headers(headers, table):
+    data = []
+    data.append(headers)
+
+    for i, v in enumerate(table):
+        data.append([v[headers[0]], v[headers[1]]])
+
+    return data
+
+
 def graph(request):
-    s = Software.objects.values('title', 'version') \
-        .annotate(num_title=Count('id')).order_by('-num_title')[0:30]
+    s = Software.objects.values('title').annotate(num_title=Count('title')).order_by('-num_title').filter(title__icontains='eikon') #[25:75]
     # s = Software.objects.all()
     print(s)
     if s.count():
-        data = mung_table(s)
+        # data = mung_table(s)
+        data = listify_table_with_headers(['title', 'num_title'], s)
         data_source = SimpleDataSource(data=data)
         # print (data)
-        #data = ModelDataSource(s, fields=['title', 'num_title'])
-        chart = BarChart(data_source,options={
-                'title': 'ASDADSF',
-                'height' : '1000'
-            })
-        #print (chart.as_html())
+        # data = ModelDataSource(s, fields=['title', 'num_title'])
+        chart = BarChart(data_source, width='100%', options={
+            'backgroundColor': 'grey',
+            'title': 'SOFTWARE',
+            'fontSize': '11'
+        })
+        # print (chart.as_html())
 
-    return render(request, 'graph.html', {'chart': chart})
+    return render(request, 'graph.html', {'chart': chart, 'software': s})
+        # return HttpResponse(chart.as_html())
 
-
-# 1. create a Room()
-# 2. import desks
-# 3. import users
-# 4. import computers
-# 5. software
+    # 1. create a Room()
+    # 2. import desks
+    # 3. import users
+    # 4. import computers
+    # 5. software
 
 
 def import_desks(request):

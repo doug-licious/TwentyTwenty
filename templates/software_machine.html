@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for s in software %}
+<div class="row"><div class="col-md-1">{{ s.computer }}</div><div class="col-md-2"> {{ s.title }}  </div><div class="col-md-6"> {{ s.version }}  </div></div>
+{% endfor %}
+{% endblock %}
