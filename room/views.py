@@ -7,6 +7,7 @@ from django.db.models import Count
 from graphos.sources.simple import SimpleDataSource
 from graphos.renderers.gchart import BarChart
 from graphos.renderers.gchart import ColumnChart
+from .forms import FilterForm
 
 
 # from graphos.renderers.yui import BarChart
@@ -80,13 +81,30 @@ def listify_table_with_headers(headers, table):
 
 
 def graph(request):
-    s = Software.objects.values('title').annotate(num_title=Count('title')).order_by('-num_title').filter(title__icontains='eikon') #[25:75]
+    form = FilterForm()
+
+    s = Software.objects.values('title').annotate(num_title=Count('title')).order_by('-num_title')
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['flatten_versions']:
+                values = ['title']
+            else:
+                values = ['title', 'version']
+
+            if form.cleaned_data['filter_text']:
+                s = Software.objects.values(*values).annotate(num_title=Count('title')).order_by('-num_title').filter(
+                    title__icontains=form.cleaned_data['filter_text'])  # [25:75]
+
     # s = Software.objects.all()
-    print(s)
     if s.count():
         # data = mung_table(s)
         data = listify_table_with_headers(['title', 'num_title'], s)
-        data_source = SimpleDataSource(data=data)
+        if (form.is_valid()):
+            data_source = SimpleDataSource(data=data[:form.cleaned_data['rows']])
+        else:
+            data_source = SimpleDataSource(data=data[:50])
+
         # print (data)
         # data = ModelDataSource(s, fields=['title', 'num_title'])
         chart = BarChart(data_source, width='100%', options={
@@ -96,8 +114,8 @@ def graph(request):
         })
         # print (chart.as_html())
 
-    return render(request, 'graph.html', {'chart': chart, 'software': s})
-        # return HttpResponse(chart.as_html())
+    return render(request, 'graph.html', {'chart': chart, 'software': s, 'form': form})
+    # return HttpResponse(chart.as_html())
 
     # 1. create a Room()
     # 2. import desks

@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit">
+</form>
+
 {% if chart %}
 
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -17,6 +24,7 @@
     <tr>
         <td>{{ s.num_title }}</td>
         <td><a href="/software/{{s.title}}">{{ s.title }}</a></td>
+        <td>{{ s.version }}</td>
     </tr>
     {% endfor %}
 </table>
