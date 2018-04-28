@@ -1,9 +1,11 @@
 from django.urls import path
-
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('login/', auth_views.login, name='login'),
+    path('logout/', auth_views.logout, name='logout'),
     path('import_users/', views.import_users, name='import_users'),
     path('import_desks/', views.import_desks, name='import_desks'),
     path('import_computers/', views.import_computers, name='import_computers'),

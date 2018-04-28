@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .resources import DeskResource, DRUserResource
 from .models import Room, DRUser, Computer, Desk, Software
 from django.db.models import Count
 
@@ -8,12 +7,16 @@ from graphos.sources.simple import SimpleDataSource
 from graphos.renderers.gchart import BarChart
 from graphos.renderers.gchart import ColumnChart
 from .forms import FilterForm
+from django.contrib.auth.decorators import login_required
 
+# my helper functions
+from room.utils import *
 
 # from graphos.renderers.yui import BarChart
 
 # Create your views here.
 
+@login_required
 def index(request):
     # r = DRUser.objects.order_by('-username',)[:5]
     c = Computer.objects.all()
@@ -25,7 +28,7 @@ def index(request):
     return render(request, 'index.html', {'computers': c, 'users': u, 'desks': d})
     # return HttpResponse(r[0].desk_number)
 
-
+@login_required
 def software(request, title):
     # s = Software.objects.values('title') \
     s = Software.objects.filter(title__icontains=title)
@@ -33,22 +36,22 @@ def software(request, title):
 
     return render(request, 'software_machine.html', {'software': s})
 
-
+@login_required
 def software2(request):
     s = Software.objects.values('title', 'version') \
         .annotate(num_title=Count('id'))
     return render(request, 'software.html', {'software': s})
 
-
+@login_required
 def desk(request, desk_number):
     return HttpResponse("View Desk: " + str(desk_number))
 
-
+@login_required
 def computer(request, hostname):
     c = Computer.objects.get(hostname=hostname)
     return render(request, 'computer.html', {'computer': c})
 
-
+@login_required
 def computers(request):
     c = Computer.objects.all()
     cpu = Computer.objects.values('cpu').annotate(Count('cpu')).order_by('-cpu__count')
@@ -58,28 +61,7 @@ def computers(request):
     return render(request, 'computers.html', {'computers': c, 'cpu': cpu, 'subnet': subnet, 'ram': ram})
 
 
-# Graphos doesn't like the Queryset result from .values, so turn it into a list it will swallow.
-def mung_table(table):
-    data = []
-    data.append(['title', 'num_title'])
-    for i, v in enumerate(table):
-        data.append([v['title'], v['num_title']])
-
-    return data
-
-
-# Graphos doesn't like the Queryset result from .values, so turn it into a list it will swallow.
-# expect headers to match column names
-def listify_table_with_headers(headers, table):
-    data = []
-    data.append(headers)
-
-    for i, v in enumerate(table):
-        data.append([v[headers[0]], v[headers[1]]])
-
-    return data
-
-
+@login_required
 def graph(request):
     form = FilterForm()
 
@@ -108,7 +90,6 @@ def graph(request):
         # print (data)
         # data = ModelDataSource(s, fields=['title', 'num_title'])
         chart = BarChart(data_source, width='100%', options={
-            'backgroundColor': 'grey',
             'title': 'SOFTWARE',
             'fontSize': '11'
         })
@@ -123,7 +104,7 @@ def graph(request):
     # 4. import computers
     # 5. software
 
-
+@login_required
 def import_desks(request):
     f = open('desks.csv', 'r')
     next(f)  # skip header row
@@ -140,7 +121,7 @@ def import_desks(request):
     f.close()
     return HttpResponse("IMPORTED DESKS")
 
-
+@login_required
 def import_users(request):
     f = open('users.csv', 'r')
     next(f)  # skip header row
@@ -160,7 +141,7 @@ def import_users(request):
     f.close()
     return HttpResponse("IMPORTED USERS")
 
-
+@login_required
 def import_computers(request):
     f = open('machines.csv', 'r')
     next(f)  # skip header row
@@ -191,7 +172,7 @@ def import_computers(request):
 
     return HttpResponse("IMPORTED PCS")
 
-
+@login_required
 def import_software(request):
     with open('software2.csv') as fp:
         fp.readline()
